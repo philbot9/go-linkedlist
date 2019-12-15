@@ -251,11 +251,13 @@ func (ll *LinkedList) Filter(predicate func(interface{}, uint) bool) *LinkedList
 
 // Removes all values from the list
 func (ll *LinkedList) Clear() {
+	ll.Lock()
 	if ll.size > 0 {
 		ll.head = nil
 		ll.tail = nil
 		ll.size = 0
 	}
+	ll.Unlock()
 }
 
 // Finds the node at a given index
