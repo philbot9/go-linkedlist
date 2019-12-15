@@ -25,6 +25,7 @@ Returns an error message for IndexOutOfRangeError
 
 ```go
 type LinkedList struct {
+	sync.RWMutex
 }
 ```
 
@@ -114,7 +115,7 @@ Removes an item at a given position in the list and returns it
 ```go
 func (ll *LinkedList) Set(index uint, data interface{})
 ```
-Replaces an existing item in the list, or can be used to append
+Replaces the value of existing item in the list
 
 #### func (*LinkedList) Size
 
