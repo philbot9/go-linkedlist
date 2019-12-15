@@ -2,11 +2,12 @@ package linkedlist
 
 import (
 	"fmt"
+	"sync"
 )
 
 // A representation of a Doubly-LinkedList
 type LinkedList struct {
-	/* sync.RWMutex */
+	sync.RWMutex
 	head *LinkedListNode
 	tail *LinkedListNode
 	size uint
@@ -40,6 +41,9 @@ func NewLinkedList() *LinkedList {
 
 // Returns the first element in the list or nil if the list is empty
 func (ll *LinkedList) Head() interface{} {
+	ll.RLock()
+	defer ll.RUnlock()
+
 	if ll.head != nil {
 		return ll.head.data
 	}
@@ -49,6 +53,9 @@ func (ll *LinkedList) Head() interface{} {
 
 // Returns the last element in the list or nil if the list is empty
 func (ll *LinkedList) Tail() interface{} {
+	ll.RLock()
+	defer ll.RUnlock()
+
 	if ll.tail != nil {
 		return ll.tail.data
 	}
@@ -58,12 +65,18 @@ func (ll *LinkedList) Tail() interface{} {
 
 // Returns the number of items stored in the list
 func (ll *LinkedList) Size() uint {
+	ll.RLock()
+	defer ll.RUnlock()
+
 	return ll.size
 }
 
 // Returns a value stored at the given index in the list or nil if no item
 // exists at the given index
 func (ll *LinkedList) Get(index uint) interface{} {
+	ll.RLock()
+	defer ll.RUnlock()
+
 	if index >= ll.size {
 		return nil
 	}
@@ -82,6 +95,8 @@ func (ll *LinkedList) Get(index uint) interface{} {
 
 // Adds a new item at the BEGINNING of the list
 func (ll *LinkedList) Push(data interface{}) {
+	ll.Lock()
+
 	newNode := &LinkedListNode{
 		data: data,
 		prev: nil,
@@ -98,10 +113,14 @@ func (ll *LinkedList) Push(data interface{}) {
 
 	ll.head = newNode
 	ll.size++
+
+	ll.Unlock()
 }
 
 // Adds a new item to the END of the list
 func (ll *LinkedList) PushBack(data interface{}) {
+	ll.Lock()
+
 	newNode := &LinkedListNode{
 		data: data,
 		prev: ll.tail,
@@ -118,66 +137,74 @@ func (ll *LinkedList) PushBack(data interface{}) {
 
 	ll.tail = newNode
 	ll.size++
+
+	ll.Unlock()
 }
 
-// Replaces an existing item in the list, or can be used to append
+// Replaces the value of existing item in the list
 func (ll *LinkedList) Set(index uint, data interface{}) {
-	if index > ll.size {
+	ll.Lock()
+	defer ll.Unlock()
+
+	if index >= ll.size {
 		panic(&IndexOutOfRangeError{size: ll.size})
 	}
 
-	if index == ll.size {
-		ll.PushBack(data)
-	} else {
-		currentNode := ll.findNode(index)
-		currentNode.data = data
-	}
+	node := ll.findNode(index)
+	node.data = data
 }
 
 // Removes the item at the BEGINNING of the list and returns it
 func (ll *LinkedList) Pop() interface{} {
+	ll.Lock()
+	defer ll.Unlock()
+
 	if ll.size == 0 {
 		return nil
 	}
 
-	return ll.Remove(0)
+	node := ll.head
+	ll.removeNode(0)
+
+	return node.data
 }
 
 // Removes the item at the END of the list and returns it
 func (ll *LinkedList) PopBack() interface{} {
+	ll.Lock()
+	defer ll.Unlock()
+
 	if ll.size == 0 {
 		return nil
 	}
 
-	return ll.Remove(ll.size - 1)
+	node := ll.tail
+	ll.removeNode(ll.size - 1)
+
+	return node.data
 }
 
 // Removes an item at a given position in the list and returns it
 func (ll *LinkedList) Remove(index uint) interface{} {
+	ll.Lock()
+	defer ll.Unlock()
+
 	if index >= ll.size {
 		panic(&IndexOutOfRangeError{ll.size})
 	}
 
 	node := ll.findNode(index)
 
-	if node.prev == nil {
-		ll.head = node.next
-	} else {
-		node.prev.next = node.next
-	}
+	ll.removeNode(index)
 
-	if node.next == nil {
-		ll.tail = node.prev
-	} else {
-		node.next.prev = node.prev
-	}
-
-	ll.size--
 	return node.data
 }
 
 // Maps over all values in the list and creates a new list of mapped values
 func (ll *LinkedList) Map(fn func(interface{}, uint) interface{}) *LinkedList {
+	ll.RLock()
+	ll.RUnlock()
+
 	newList := NewLinkedList()
 
 	currentNode := ll.head
@@ -195,6 +222,9 @@ func (ll *LinkedList) Map(fn func(interface{}, uint) interface{}) *LinkedList {
 // Applies the predicate to all items in the list and returns a new list of all
 // values that satisfy the predicate.
 func (ll *LinkedList) Filter(predicate func(interface{}, uint) bool) *LinkedList {
+	ll.RLock()
+	ll.RUnlock()
+
 	newList := NewLinkedList()
 
 	currentNode := ll.head
@@ -251,4 +281,22 @@ func (ll *LinkedList) findNode(index uint) *LinkedListNode {
 	}
 
 	return currentNode
+}
+
+func (ll *LinkedList) removeNode(index uint) {
+	node := ll.findNode(index)
+
+	if node.prev == nil {
+		ll.head = node.next
+	} else {
+		node.prev.next = node.next
+	}
+
+	if node.next == nil {
+		ll.tail = node.prev
+	} else {
+		node.next.prev = node.prev
+	}
+
+	ll.size--
 }

@@ -183,7 +183,7 @@ func TestSetOutOfBoundsEmptyList(t *testing.T) {
 		}
 	}()
 
-	ll.Set(1, 1)
+	ll.Set(0, 1)
 }
 
 func TestSetOutOfBounds(t *testing.T) {
@@ -202,7 +202,7 @@ func TestSetOutOfBounds(t *testing.T) {
 		ll.Push(value)
 	}
 
-	ll.Set(6, 1)
+	ll.Set(5, 1)
 }
 
 func TestSet(t *testing.T) {
@@ -213,24 +213,24 @@ func TestSet(t *testing.T) {
 		ll.Push(value)
 	}
 
-	ll.Set(5, 99)
-	appendedValue := ll.Get(5)
+	ll.Set(4, 99)
+	appendedValue := ll.Get(4)
 	if appendedValue != 99 {
 		t.Errorf("Expected to find value in List, but got %v", appendedValue)
 	}
-	expectedList := []int{5, 4, 3, 2, 1, 99}
+	expectedList := []int{5, 4, 3, 2, 99}
 	if !listEquals(*ll, expectedList) {
-		t.Errorf("Expected list to equal {5, 4, 3, 2, 1, 99}")
+		t.Errorf("Expected list to equal {5, 4, 3, 2, 99}")
 	}
 
-	ll.Set(5, 100)
-	replacedLastValue := ll.Get(5)
+	ll.Set(4, 100)
+	replacedLastValue := ll.Get(4)
 	if replacedLastValue != 100 {
 		t.Errorf("Expected to find value in List, but got %v", replacedLastValue)
 	}
-	expectedList = []int{5, 4, 3, 2, 1, 100}
+	expectedList = []int{5, 4, 3, 2, 100}
 	if !listEquals(*ll, expectedList) {
-		t.Errorf("Expected list to equal {5, 4, 3, 2, 1, 100}")
+		t.Errorf("Expected list to equal {5, 4, 3, 2, 100}")
 	}
 
 	ll.Set(0, 98)
@@ -238,9 +238,9 @@ func TestSet(t *testing.T) {
 	if replacedFirstValue != 98 {
 		t.Errorf("Expected to find value in List, but got %v", replacedFirstValue)
 	}
-	expectedList = []int{98, 4, 3, 2, 1, 100}
+	expectedList = []int{98, 4, 3, 2, 100}
 	if !listEquals(*ll, expectedList) {
-		t.Errorf("Expected list to equal {98, 4, 3, 2, 1, 100}")
+		t.Errorf("Expected list to equal {98, 4, 3, 2, 100}")
 	}
 }
 
