@@ -1,15 +1,19 @@
 package linkedlist
 
 import (
+	"regexp"
 	"testing"
 )
 
 func TestIndexOutOfRangeError(t *testing.T) {
-	testErr := IndexOutOfRangeError{size: 2}
-	testErrStr := testErr.Error()
+	testErrEmptyList := IndexOutOfRangeError{size: 0}
+	if matched, _ := regexp.MatchString("\\[0, 0\\]", testErrEmptyList.Error()); !matched {
+		t.Errorf("Expected IndexOutOfRangeError.Error() to give range [0, 0]. Got %v", testErrEmptyList.Error())
+	}
 
-	if len(testErrStr) == 0 {
-		t.Errorf("Expected IndexOutOfRangeError.Error() to return an error string")
+	testErr := IndexOutOfRangeError{size: 5}
+	if matched, _ := regexp.MatchString("\\[0, 4\\]", testErr.Error()); !matched {
+		t.Errorf("Expected IndexOutOfRangeError.Error() to give range [0, 4]. Got %v", testErr.Error())
 	}
 }
 
@@ -140,7 +144,7 @@ func TestPush(t *testing.T) {
 	}
 
 	expectedList := []int{5, 4, 3, 2, 1}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {5, 4, 3, 2, 1}")
 	}
 }
@@ -167,7 +171,7 @@ func TestPushBack(t *testing.T) {
 	}
 
 	expectedList := []int{1, 2, 3, 4, 5}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {1, 2, 3, 4, 5}")
 	}
 }
@@ -219,7 +223,7 @@ func TestSet(t *testing.T) {
 		t.Errorf("Expected to find value in List, but got %v", appendedValue)
 	}
 	expectedList := []int{5, 4, 3, 2, 99}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {5, 4, 3, 2, 99}")
 	}
 
@@ -229,7 +233,7 @@ func TestSet(t *testing.T) {
 		t.Errorf("Expected to find value in List, but got %v", replacedLastValue)
 	}
 	expectedList = []int{5, 4, 3, 2, 100}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {5, 4, 3, 2, 100}")
 	}
 
@@ -239,7 +243,7 @@ func TestSet(t *testing.T) {
 		t.Errorf("Expected to find value in List, but got %v", replacedFirstValue)
 	}
 	expectedList = []int{98, 4, 3, 2, 100}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {98, 4, 3, 2, 100}")
 	}
 }
@@ -299,7 +303,7 @@ func TestPopBack(t *testing.T) {
 	}
 
 	expectedList := []int{}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {}")
 	}
 }
@@ -315,7 +319,7 @@ func TestRemoveOutOfBoundsEmptyList(t *testing.T) {
 		}
 
 		expectedList := []int{}
-		if !listEquals(*ll, expectedList) {
+		if !listEquals(ll, expectedList) {
 			t.Errorf("Expected list to equal {}")
 		}
 	}()
@@ -335,7 +339,7 @@ func TestRemoveOutOfBounds(t *testing.T) {
 		}
 
 		expectedList := []int{5, 4, 3, 2, 1}
-		if !listEquals(*ll, expectedList) {
+		if !listEquals(ll, expectedList) {
 			t.Errorf("Expected list to equal {5, 4, 3, 2, 1}")
 		}
 	}()
@@ -360,7 +364,7 @@ func TestRemove(t *testing.T) {
 		t.Errorf("Expected to get 1, but got %v", lastValue)
 	}
 	expectedList := []int{5, 4, 3, 2}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {5, 4, 3, 2}")
 	}
 
@@ -369,7 +373,7 @@ func TestRemove(t *testing.T) {
 		t.Errorf("Expected to get 5, but got %v", firstValue)
 	}
 	expectedList = []int{4, 3, 2}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {4, 3, 2}")
 	}
 
@@ -378,7 +382,7 @@ func TestRemove(t *testing.T) {
 		t.Errorf("Expected to get 3, but got %v", middleValue)
 	}
 	expectedList = []int{4, 2}
-	if !listEquals(*ll, expectedList) {
+	if !listEquals(ll, expectedList) {
 		t.Errorf("Expected list to equal {4, 2}")
 	}
 }
@@ -394,7 +398,7 @@ func TestMapEmptyList(t *testing.T) {
 	newList := ll.Map(fn)
 
 	expectedList := []int{}
-	if !listEquals(*newList, expectedList) {
+	if !listEquals(newList, expectedList) {
 		t.Errorf("Expected list to be empty")
 	}
 }
@@ -417,12 +421,12 @@ func TestMap(t *testing.T) {
 
 	newLl := ll.Map(fn)
 
-	if !listEquals(*ll, values) {
+	if !listEquals(ll, values) {
 		t.Errorf("Expected original list to be unchanged")
 	}
 
 	expectedNewList := []int{2, 4, 6, 8, 10}
-	if !listEquals(*newLl, expectedNewList) {
+	if !listEquals(newLl, expectedNewList) {
 		t.Errorf("Expected new list with mapped values")
 	}
 }
@@ -438,7 +442,7 @@ func TestFilterEmptyList(t *testing.T) {
 	newList := ll.Filter(predicate)
 
 	expectedList := []int{}
-	if !listEquals(*newList, expectedList) {
+	if !listEquals(newList, expectedList) {
 		t.Errorf("Expected list to be empty")
 	}
 }
@@ -461,12 +465,12 @@ func TestFilter(t *testing.T) {
 
 	newLl := ll.Filter(predicate)
 
-	if !listEquals(*ll, values) {
+	if !listEquals(ll, values) {
 		t.Errorf("Expected original list to be unchanged")
 	}
 
 	expectedNewList := []int{1, 2, 3}
-	if !listEquals(*newLl, expectedNewList) {
+	if !listEquals(newLl, expectedNewList) {
 		t.Errorf("Expected new list with filtered values")
 	}
 }
@@ -476,7 +480,7 @@ func TestClear(t *testing.T) {
 	emptyArr := []int{}
 
 	ll.Clear()
-	if !listEquals(*ll, emptyArr) {
+	if !listEquals(ll, emptyArr) {
 		t.Errorf("Expected list to be empty")
 	}
 
@@ -486,13 +490,13 @@ func TestClear(t *testing.T) {
 	}
 
 	ll.Clear()
-	if !listEquals(*ll, emptyArr) {
+	if !listEquals(ll, emptyArr) {
 		t.Errorf("Expected list to be empty")
 	}
 
 }
 
-func listEquals(ll LinkedList, arr []int) bool {
+func listEquals(ll *LinkedList, arr []int) bool {
 	if ll.Size() != uint(len(arr)) {
 		return false
 	}
