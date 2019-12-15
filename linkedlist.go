@@ -6,10 +6,10 @@ import (
 
 // A representation of a Doubly-LinkedList
 type LinkedList struct {
+	/* sync.RWMutex */
 	head *LinkedListNode
 	tail *LinkedListNode
 	size uint
-	/* lock sync.RWMutex */
 }
 
 // A Node within a LinkedList
@@ -31,7 +31,11 @@ func (e *IndexOutOfRangeError) Error() string {
 
 // Initializes a new empty LinkedList
 func NewLinkedList() *LinkedList {
-	return &LinkedList{nil, nil, 0}
+	return &LinkedList{
+		head: nil,
+		tail: nil,
+		size: 0,
+	}
 }
 
 // Returns the first element in the list or nil if the list is empty
@@ -108,7 +112,7 @@ func (ll *LinkedList) PushBack(data interface{}) {
 		ll.tail.next = newNode
 	}
 
-	if ll.tail == nil {
+	if ll.head == nil {
 		ll.head = newNode
 	}
 
