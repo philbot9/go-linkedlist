@@ -210,7 +210,7 @@ func (ll *LinkedList) Remove(index uint) interface{} {
 // Maps over all values in the list and creates a new list of mapped values
 func (ll *LinkedList) Map(fn func(interface{}, uint) interface{}) *LinkedList {
 	ll.RLock()
-	ll.RUnlock()
+	defer ll.RUnlock()
 
 	newList := NewLinkedList()
 
@@ -230,7 +230,7 @@ func (ll *LinkedList) Map(fn func(interface{}, uint) interface{}) *LinkedList {
 // values that satisfy the predicate.
 func (ll *LinkedList) Filter(predicate func(interface{}, uint) bool) *LinkedList {
 	ll.RLock()
-	ll.RUnlock()
+	defer ll.RUnlock()
 
 	newList := NewLinkedList()
 
