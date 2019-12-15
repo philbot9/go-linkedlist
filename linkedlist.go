@@ -27,7 +27,14 @@ type IndexOutOfRangeError struct {
 
 // Returns an error message for IndexOutOfRangeError
 func (e *IndexOutOfRangeError) Error() string {
-	return fmt.Sprintf("Index out of range. Available range: [0, %v]", e.size)
+	var upperBound uint
+	if e.size == 0 {
+		upperBound = 0
+	} else {
+		upperBound = e.size - 1
+	}
+
+	return fmt.Sprintf("Index out of range. Available range: [0, %v]", upperBound)
 }
 
 // Initializes a new empty LinkedList
