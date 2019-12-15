@@ -141,7 +141,7 @@ func (ll *LinkedList) PushBack(data interface{}) {
 	ll.Unlock()
 }
 
-// Replaces the value of existing item in the list
+// Replaces the value of an existing item in the list
 func (ll *LinkedList) Set(index uint, data interface{}) {
 	ll.Lock()
 	defer ll.Unlock()

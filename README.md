@@ -115,7 +115,7 @@ Removes an item at a given position in the list and returns it
 ```go
 func (ll *LinkedList) Set(index uint, data interface{})
 ```
-Replaces the value of existing item in the list
+Replaces the value of an existing item in the list
 
 #### func (*LinkedList) Size
 
